@@ -1,4 +1,5 @@
 using Devops.Application;
+using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -6,7 +7,6 @@ var builder = WebApplication.CreateBuilder(args);
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 builder.Services.AddControllers();
-builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<ProductService>();
 var app = builder.Build();
 
@@ -15,8 +15,7 @@ if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 }
-app.UseSwagger();
-app.UseSwaggerUI();
+app.MapScalarApiReference();
 app.UseHttpsRedirection();
 app.MapControllers();
 
