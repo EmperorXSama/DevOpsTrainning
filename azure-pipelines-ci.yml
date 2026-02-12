@@ -6,6 +6,9 @@ trigger:
       - master
 pool: 
   name: 'default'
+variables:
+  buildConfiguration: 'Release'
+  dotnetVersion: '10.x'
   
 stages:
   - stage: Build

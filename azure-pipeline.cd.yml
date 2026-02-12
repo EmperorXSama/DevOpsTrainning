@@ -5,7 +5,13 @@ trigger:
       - develop
 pool:
    name: 'Default'
-    
+variables:
+  buildConfiguration: 'Release'
+  dotnetVersion: '10.x'
+  azureServiceConnection: 'azure-service-connection'
+  webAppDev: 'cleanarchdemo-dev'
+  webAppProd: 'cleanarchdemo-prod'
+  
 stages:
   - stage: Build
     displayName: 'Build'
