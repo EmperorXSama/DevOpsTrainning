@@ -66,7 +66,7 @@ stages:
     dependsOn: Build
     jobs:
       - job: TestJob
-        displaName: 'Run Tests'
+        displayName: 'Run Tests'
         steps:
           
           - task: UseDotNet@2
@@ -108,7 +108,7 @@ stages:
     jobs:
       - deployment: DeployDevJob
         displayName: 'Deploy to Dev App Service'
-        enviroment: 'Dev'
+        environment: 'Dev'
         strategy:
           runOnce:
             deploy:
