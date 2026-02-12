@@ -1,10 +1,14 @@
-trigger: 
+trigger:
   branches: 
-    - feature/*
-    - develop
-    - master
+    include:
+      - feature/*
+      - develop
+      - master
 pool: 
   name: 'default'
+variables:
+  buildConfiguration: 'Release'
+  dotnetVersion: '10.x'
   
 stages:
   - stage: Build
@@ -24,7 +28,7 @@ stages:
             displayName: 'Restore'
             inputs: 
               command: 'restore'
-              product: '**/*.sln'
+              projects: '**/*.sln'
               
           - task: DotNetCoreCLI@2
             displayName: 'Build'
@@ -57,7 +61,7 @@ stages:
           - task: DownloadPipelineArtifact@1
             displayName: 'Download built source'
             inputs: 
-              artifactName: 'built-source'
+              artifactName: 'build.source'
               targetPath: '$(System.DefaultWorkingDirectory)'
               
           - task: DotNetCoreCLI@2
@@ -65,7 +69,7 @@ stages:
             inputs:
               command: 'test'
               projects: 'tests/**/*Tests.csproj'
-              arguments: '--configuration $(buildConfiguration) --no-build'
+              arguments: '--configuration $(buildConfiguration) --no-restore'
               publishTestResults: true
 
           - task: PublishCodeCoverageResults@2
