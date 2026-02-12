@@ -26,7 +26,7 @@ stages:
             inputs:
               version: $(dotnetVersion)
               packageType: 'sdk'
-              includePrevieVersions: true
+              includePreviewVersions: true
               
           - task: DotNetCoreCLI@2
             displayName: 'Restore packages'
@@ -71,8 +71,10 @@ stages:
           
           - task: UseDotNet@2
             displayName: 'Install .NET $(dotnetVersion)'
-            packageType: 'sdk'
-            includePreviewVersions: true
+            inputs:
+              version: $(dotnetVersion)
+              packageType: 'sdk'
+              includePreviewVersions: true
           
           - task: DownloadPipelineArtifact@2
             displayName: 'Download built source'
@@ -83,7 +85,7 @@ stages:
           - task: DotNetCoreCLI@2
             displayName: 'Run tests'
             inputs:
-              command: 'tests'
+              command: 'test'
               projects: 'tests/**/*tests.csproj'
               arguments: >-
                 --configuration $(buildConfiguration)
@@ -96,7 +98,7 @@ stages:
             displayName: 'Publis coverage report'
             condition: succeededOrFailed()
             inputs:
-              summaryFileLocation: '@(Agent.TempDirectory)/TestResults/**/coverage.codertura.xml'
+              summaryFileLocation: '$(Agent.TempDirectory)/TestResults/**/coverage.codertura.xml'
               failIfCoverageEmoty: false
         
   - stage: DeployDev
@@ -114,7 +116,7 @@ stages:
             deploy:
               steps:
                 
-                - task: UseDotnet@2
+                - task: UseDotNet@2
                   displayName: 'Install .NET $(dotnetVersion)'
                   inputs:
                     version: $(dotnetVersion)
@@ -127,7 +129,7 @@ stages:
                     artifactName: 'drop'
                     targetPath: '$(System.DefaultWorkingDirectory)/deploy'
                 
-                - task: AzureWepApp@2
+                - task: AzureWebApp@1
                   displayName: 'Deploy to cleanArchdemo.dev'
                   inputs:
                     azureSubscription: '$(azureServiceConnection)'
