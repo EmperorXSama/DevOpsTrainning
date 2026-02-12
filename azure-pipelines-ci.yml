@@ -1,0 +1,77 @@
+trigger: 
+  branches: 
+    - feature/*
+    - develop
+    - master
+pool: 
+  name: 'default'
+  
+stages:
+  - stage: Build
+    displayName: 'Build'
+    jobs:
+      - job: BuildJob
+        displayName: 'Build'
+        steps:
+          - task: UseDotNet@2
+            displayName: 'Installing .NET $(dotnetVersion)'
+            inputs: 
+              version: $(dotnetVersion)
+              packageType: 'sdk'
+              includePreviewVersions: true
+              
+          - task: DotNetCoreCLI@2
+            displayName: 'Restore'
+            inputs: 
+              command: 'restore'
+              product: '**/*.sln'
+              
+          - task: DotNetCoreCLI@2
+            displayName: 'Build'
+            inputs: 
+              command: 'build'
+              project: '**/*.sln'
+              arguments: '--configuration $(buildConfiguration) --no-restore'
+              
+          - task: PublishPipelineArtifact@1
+            displayName: 'Upload source for testing'
+            inputs: 
+              targetPath: '$(System.DefaultWorkingDirectory)'
+              artifactName: 'build.source'
+              publishLocation: 'pipeline'
+              
+  - stage: Test
+    displayName: 'Test'
+    dependsOn: Build
+    jobs:
+      - job: TestJob
+        displayName: 'Run Tests'
+        steps:
+          - task: UseDotNet@2
+            displayName: 'Installing .NET $(dotnetVersion)'
+            inputs:
+              version: $(dotnetVersion)
+              packageType: 'sdk'
+              includePreviewVersions: true
+          
+          - task: DownloadPipelineArtifact@1
+            displayName: 'Download built source'
+            inputs: 
+              artifactName: 'built-source'
+              targetPath: '$(System.DefaultWorkingDirectory)'
+              
+          - task: DotNetCoreCLI@2
+            displayName: 'Run unit tests'
+            inputs:
+              command: 'test'
+              projects: 'tests/**/*Tests.csproj'
+              arguments: '--configuration $(buildConfiguration) --no-build'
+              publishTestResults: true
+
+          - task: PublishCodeCoverageResults@2
+            displayName: 'Publish coverage'
+            condition: succeededOrFailed()
+            inputs:
+              summaryFileLocation: '$(Agent.TempDirectory)/TestResults/**/coverage.cobertura.xml'
+              failIfCoverageEmpty: false
+            
