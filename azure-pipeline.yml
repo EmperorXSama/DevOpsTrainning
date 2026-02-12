@@ -9,8 +9,8 @@ pool:
 variables:
   buildConfiguration: 'Release'
   dotnetVersion: '10.x'
-  webAppDev: 'cleanarchdemo.dev'
-  webAppProd: 'cleanarchdemo.prod'
+  webAppDev: 'cleanarchdemo-dev'
+  webAppProd: 'cleanarchdemo-prod'
   azureServiceConnection: 'azure-service-connection'
 
 stages:
