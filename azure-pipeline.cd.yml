@@ -1,9 +1,10 @@
 trigger: 
   branches: 
-    - master
-    - develop
+    include:
+      - master
+      - develop
 pool:
-  - name: 'Default'
+   name: 'Default'
     
 stages:
   - stage: Build
