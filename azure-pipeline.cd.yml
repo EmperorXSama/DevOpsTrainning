@@ -99,7 +99,7 @@ stages:
     displayName: 'Migrate Dev Database'
     dependsOn: Test
     condition: |
-      and(secceeded(),eq(variables['Build.SourceBranch'],'refs/heads/develop')
+      and(succeeded(),eq(variables['Build.SourceBranch'],'refs/heads/develop')
       )
     variables: 
       - group: vg-dev
@@ -133,7 +133,7 @@ stages:
     displayName: 'Migrate to Prod'
     dependsOn: Test
     condition: |
-      and(secceeded(),eq(variables['Build.SourceBranch'],'refs/heads/master')
+      and(succeeded(),eq(variables['Build.SourceBranch'],'refs/heads/master')
       )
     variables: 
       - group: vg-prod
@@ -146,13 +146,13 @@ stages:
             inputs: 
               version: $(dotnetVersion)
               packageType: 'sdk'
-              includePreviewVersions: trye
+              includePreviewVersions: true
           
           - task : DownloadPipelineArtifact@2
             displayName: 'Download built source'
             inputs: 
               artifactName: 'built-source'
-              target: '$(System.DefaultWorkingDirectory)'
+              targetPath: '$(System.DefaultWorkingDirectory)'
             
           - task: DotNetCoreCLI@2
             displayName: 'Run prod migrations command'
