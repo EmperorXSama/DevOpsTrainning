@@ -127,7 +127,7 @@ stages:
               projects: 'src/Devops.API/Devops.API.csproj'
               arguments: '--configuration $(buildConfiguration) -- --migrate'
             env:
-              connectionStrings__Default: $(ConnectionString)
+              ConnectionStrings__Default: $(ConnectionString)
   
   - stage: MigrateProd
     displayName: 'Migrate to Prod'
