@@ -4,50 +4,32 @@ namespace Devops.Application;
 
 public class ProductService
 {
-    private readonly List<Product> _products;
+    private readonly IProductRepository _repository;
 
-    public ProductService()
+    public ProductService(IProductRepository repository)
     {
-        _products = Enumerable.Range(5, 20)
-            .Select(i => new Product
-            {
-                Id = Guid.NewGuid(),
-                CreatedAt = DateTime.UtcNow,
-                Name = $"Product {i}",
-                Price = i
-            }).ToList();
+        _repository = repository;
     }
 
-    public List<Product> GetAllProducts()
-        => _products;
+    public async Task<List<Product>> GetAllProductsAsync()
+        => await _repository.GetAllAsync();
 
-    public Product? GetProductById(Guid id)
-        => _products.FirstOrDefault(p => p.Id == id);
+    public async Task<Product?> GetProductByIdAsync(Guid id)
+        => await _repository.GetByIdAsync(id);
 
-    public Product? CreateProduct(string name, decimal price)
+    public async Task<Product?> CreateProductAsync(string name, decimal price, Guid categoryId)
     {
         if (string.IsNullOrWhiteSpace(name) || price <= 0)
             return null;
 
-        var product = new Product
+        return await _repository.CreateAsync(new Product
         {
-            Id = Guid.NewGuid(),
             Name = name,
             Price = price,
-            CreatedAt = DateTime.UtcNow
-        };
-
-        _products.Add(product);
-        return product;
+            CategoryId = categoryId
+        });
     }
 
-    public bool DeleteProduct(Guid id)
-    {
-        var product = GetProductById(id);
-        if (product == null)
-            return false;
-
-        _products.Remove(product);
-        return true;
-    }
+    public async Task<bool> DeleteProductAsync(Guid id)
+        => await _repository.DeleteAsync(id);
 }

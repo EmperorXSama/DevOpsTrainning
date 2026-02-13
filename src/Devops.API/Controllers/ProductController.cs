@@ -1,4 +1,5 @@
-﻿using Devops.Application;
+﻿// src/Devops.API/Controllers/ProductController.cs
+using Devops.Application;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Devops.API.Controllers;
@@ -15,36 +16,33 @@ public class ProductController : ControllerBase
     }
 
     [HttpGet]
-    public IActionResult GetAll()
-        => Ok(_service.GetAllProducts());
+    public async Task<IActionResult> GetAll()
+        => Ok(await _service.GetAllProductsAsync());
 
     [HttpGet("{id}")]
-    public IActionResult GetById(Guid id)
+    public async Task<IActionResult> GetById(Guid id)
     {
-        var product = _service.GetProductById(id);
-        if (product == null)
-            return NotFound();
-
+        var product = await _service.GetProductByIdAsync(id);
+        if (product == null) return NotFound();
         return Ok(product);
     }
 
     [HttpPost]
-    public IActionResult Create(string name, decimal price)
+    public async Task<IActionResult> Create(
+        [FromQuery] string name,
+        [FromQuery] decimal price,
+        [FromQuery] Guid categoryId)
     {
-        var product = _service.CreateProduct(name, price);
-        if (product == null)
-            return BadRequest();
-
+        var product = await _service.CreateProductAsync(name, price, categoryId);
+        if (product == null) return BadRequest();
         return Ok(product);
     }
 
     [HttpDelete("{id}")]
-    public IActionResult Delete(Guid id)
+    public async Task<IActionResult> Delete(Guid id)
     {
-        var deleted = _service.DeleteProduct(id);
-        if (!deleted)
-            return NotFound();
-
+        var deleted = await _service.DeleteProductAsync(id);
+        if (!deleted) return NotFound();
         return NoContent();
     }
 }
