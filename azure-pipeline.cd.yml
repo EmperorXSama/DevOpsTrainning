@@ -119,7 +119,7 @@ stages:
             inputs:
               artifactName: 'built-source'
               targetPath: '$(System.DefaultWorkingDirectory)'
-          - script: echo $(ConnectionString)
+          - script: echo $(ConnectionStrings--Default)
             displayName: "Debug connection string"    
           - task: DotNetCoreCLI@2
             displayName: 'RUN dev Migrations'
@@ -128,7 +128,7 @@ stages:
               projects: 'src/Devops.API/Devops.API.csproj'
               arguments: '--configuration $(buildConfiguration) -- --migrate'
             env:
-              ConnectionStrings__Default: $(ConnectionString)
+              ConnectionStrings__Default: $(ConnectionStrings--Default)
   
   - stage: MigrateProd
     displayName: 'Migrate to Prod'
@@ -162,7 +162,7 @@ stages:
               projects: 'src/Devops.API/Devops.API.csproj'
               arguments: '--configuration $(buildConfiguration) -- --migrate'
             env:
-              ConnectionStrings__Default: $(ConnectionString)
+              ConnectionStrings__Default: $(ConnectionStrings--Default)
               
   - stage: DeployDev
     displayName: 'Deploy to Dev'
@@ -204,7 +204,7 @@ stages:
                     package: '$(System.DefaultWorkingDirectory)/deploy/*.zip'
                     deploymentMethod: 'auto'
                     appSettings: >-
-                      -ConnectionStrings__Default "$(ConnectionString)"
+                      -ConnectionStrings__Default "$(ConnectionStrings--Default)"
 
   - stage: DeployProd
     displayName: 'Deploy to Prod'
@@ -246,4 +246,4 @@ stages:
                     package: '$(System.DefaultWorkingDirectory)/deploy/*.zip'
                     deploymentMethod: 'auto'
                     appSettings: >-
-                      -ConnectionStrings__Default "$(ConnectionString)"
+                      -ConnectionStrings__Default "$(ConnectionStrings--Default)"
