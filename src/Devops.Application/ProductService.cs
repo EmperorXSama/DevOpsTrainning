@@ -11,7 +11,7 @@ public class ProductService
         _repository = repository;
     }
 
-    public async Task<List<Product>> GetAllProductsAsync()
+    public async Task<List<ProductDto>> GetAllProductsAsync()
         => await _repository.GetAllAsync();
 
     public async Task<Product?> GetProductByIdAsync(Guid id)

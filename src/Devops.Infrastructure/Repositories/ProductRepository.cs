@@ -15,10 +15,22 @@ public class ProductRepository : IProductRepository
         _context = context;
     }
 
-    public async Task<List<Product>> GetAllAsync()
-        => await _context.Products
+    public async Task<List<ProductDto>> GetAllAsync()
+    {
+        return await _context.Products
             .Include(p => p.Category)
+            .Select(p => new ProductDto
+            {
+                Id = p.Id,
+                Name = p.Name,
+                Price = p.Price,
+                CreatedAt = p.CreatedAt,
+                CategoryId = p.CategoryId,
+                CategoryName = p.Category.Name
+            })
             .ToListAsync();
+    }
+
 
     public async Task<Product?> GetByIdAsync(Guid id)
         => await _context.Products
