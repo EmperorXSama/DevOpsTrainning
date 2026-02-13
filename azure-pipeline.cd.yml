@@ -93,9 +93,79 @@ stages:
             inputs:
               summaryFileLocation: '$(Agent.TempDirectory)/TestResults/**/coverage.cobertura.xml'
               failIfCoverageEmpty: false
+              
+              
+  - stage: MigrateDev
+    displayName: 'Migrate Dev Database'
+    dependsOn: Test
+    condition: |
+      and(secceeded(),eq(variables['Build.SourceBranch'],'refs/heads/develop')
+      )
+    variables: 
+      - group: vg-dev
+    jobs:
+      - job: MigrateDevJob
+        displayName: 'Run Dev Migrations'
+        steps:
+          - task: UseDotNet@2
+            displayName: 'Install .NET $(dotnetVersion)'
+            inputs:
+              version: $(dotnetVersion)
+              includePreviewVersions: true
+              packageType: 'sdk'
+          
+          - task: DownloadPipelineArtifact@2
+            displayName: 'Download built source'
+            inputs:
+              artifactName: 'built-source'
+              targetPath: '$(System.DefaultWorkingDirectory)'
+              
+          - task: DotNetCoreCLI@2
+            displayName: 'RUN dev Migrations'
+            inputs: 
+              command: 'run'
+              project: 'src/Devops.API/Devops.API.csproj'
+              arguments: '--configuration $(buildConfiguration) --migrate'
+            env:
+              connectionStrings__Default: $(ConnectionString)
+  
+  - stage: MigrateProd
+    displayName: 'Migrate to Prod'
+    dependsOn: Test
+    condition: |
+      and(secceeded(),eq(variables['Build.SourceBranch'],'refs/heads/master')
+      )
+    variables: 
+      - group: vg-prod
+    jobs:
+      - job: MigrateProdJob
+        displayName: 'Run prod migration'
+        steps:
+          - task: UseDotNet@2
+            displayName: 'Install .NET $(dotnetVersion)'
+            inputs: 
+              version: $(dotnetVersion)
+              packageType: 'sdk'
+              includePreviewVersions: trye
+          
+          - task : DownloadPipelineArtifact@2
+            displayName: 'Download built source'
+            inputs: 
+              artifactName: 'built-source'
+              target: '$(System.DefaultWorkingDirectory)'
+            
+          - task: DotNetCoreCLI@2
+            displayName: 'Run prod migrations command'
+            inputs:
+              command: 'run'
+              project: 'src/Devops.API/Devops.API.csproj'
+              arguments: '--configuration $(buildConfiguration) --migrate'
+            env:
+              ConnectionStrings__Default: $(ConnectionString)
+              
   - stage: DeployDev
     displayName: 'Deploy to Dev'
-    dependsOn: Test
+    dependsOn: MigrateDev
     condition: |
       and(
         succeeded(),
@@ -137,7 +207,7 @@ stages:
 
   - stage: DeployProd
     displayName: 'Deploy to Prod'
-    dependsOn: Test
+    dependsOn: MigrateProd
     condition: |
       and(
         succeeded(),
