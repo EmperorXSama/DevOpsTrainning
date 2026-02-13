@@ -119,7 +119,8 @@ stages:
             inputs:
               artifactName: 'built-source'
               targetPath: '$(System.DefaultWorkingDirectory)'
-              
+          - script: echo $(ConnectionString)
+            displayName: "Debug connection string"    
           - task: DotNetCoreCLI@2
             displayName: 'RUN dev Migrations'
             inputs: 
@@ -128,6 +129,8 @@ stages:
               arguments: '--configuration $(buildConfiguration) -- --migrate'
             env:
               ConnectionStrings__Default: $(ConnectionString)
+            - script: echo $(ConnectionString)
+              displayName: "Debug connection string"
   
   - stage: MigrateProd
     displayName: 'Migrate to Prod'
