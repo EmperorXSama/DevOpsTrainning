@@ -124,8 +124,8 @@ stages:
             displayName: 'RUN dev Migrations'
             inputs: 
               command: 'run'
-              project: 'src/Devops.API/Devops.API.csproj'
-              arguments: '--configuration $(buildConfiguration) --migrate'
+              projects: 'src/Devops.API/Devops.API.csproj'
+              arguments: '--configuration $(buildConfiguration) -- --migrate'
             env:
               connectionStrings__Default: $(ConnectionString)
   
@@ -158,8 +158,8 @@ stages:
             displayName: 'Run prod migrations command'
             inputs:
               command: 'run'
-              project: 'src/Devops.API/Devops.API.csproj'
-              arguments: '--configuration $(buildConfiguration) --migrate'
+              projects: 'src/Devops.API/Devops.API.csproj'
+              arguments: '--configuration $(buildConfiguration) -- --migrate'
             env:
               ConnectionStrings__Default: $(ConnectionString)
               
